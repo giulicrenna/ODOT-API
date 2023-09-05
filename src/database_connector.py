@@ -3,11 +3,6 @@ from cryptography.fernet import Fernet
 import psycopg2
 import uuid
 
-conn = psycopg2.connect(database=DATABASE,
-                        host=HOST,
-                        user=USER,
-                        password=PASSWORD,
-                        port=PORT)
 
 class Encryptor():
     def __init__(self, key=KEY) -> None:
@@ -22,68 +17,85 @@ class Encryptor():
     
 class Users():
     def __init__(self) -> None:
+        self.conn = psycopg2.connect(database=DATABASE,
+                        host=HOST,
+                        user=USER,
+                        password=PASSWORD,
+                        port=PORT)
         self.table_name: str = "users"
-        self.cursor = conn.cursor()
+        self.cursor = self.conn.cursor()
         self.encryptor = Encryptor()
         
     def add_new_user(self, mail: str, password: str, name: str, surname: str, type: str) -> None:
-        token: str = str(uuid.uuid4())
-        mail = mail.replace(" ",  "").upper()  
-        password = password.replace(" ",  "")
-        password = self.encryptor.encrypt(password)
-        name = name.replace(" ",  "").upper()  
-        surname = surname.replace(" ",  "").upper()  
-        type = type.replace(" ",  "").upper()  
-        
-        self.cursor.execute(f'INSERT INTO {self.table_name} (name, surname, mail, password, type, token) \
-            VALUES (\'{name}\', \'{surname}\', \'{mail}\', \'{password}\', \'{type}\', \'{token}\')')
-        conn.commit()
+        try:
+            token: str = str(uuid.uuid4())
+            mail = mail.replace(" ",  "").upper()  
+            password = password.replace(" ",  "")
+            password = self.encryptor.encrypt(password)
+            name = name.replace(" ",  "").upper()  
+            surname = surname.replace(" ",  "").upper()  
+            type = type.replace(" ",  "").upper()  
+
+            self.cursor.execute(f'INSERT INTO {self.table_name} (name, surname, mail, password, type, token) \
+                VALUES (\'{name}\', \'{surname}\', \'{mail}\', \'{password}\', \'{type}\', \'{token}\')')
+            self.conn.commit()
+        except psycopg2.InterfaceError:
+            return None
         
     def select_data_varchar(self, ref_column: str, value: str) -> list:
-        self.cursor.execute(f'SELECT * FROM {self.table_name} WHERE {ref_column} = \'{value}\'')
-        data: list = self.cursor.fetchall()
-        
-        print(data)
-        return data
-    
-    def select_data_integer(self, ref_column: str, value: str) -> list:
-        self.cursor.execute(f'SELECT * FROM {self.table_name} WHERE {ref_column} = {value}')
-        data: list = self.cursor.fetchall()
-        
-        return data
-    
-    def check_user(self, mail: str, password: str) -> str:
-        mail = mail.upper()
-        data: list = self.select_data_varchar("mail", mail)
-        
-        token: str = ""
-        password_: str = ""
-        name : str = ""
-        surname: str = ""
-        status: str = "bad"
-        
-        if len(data) != 0:
-            password_ = data[0][4]
-            password_ = self.encryptor.decrypt(password_)
-            print(password)
+        try:
+            self.cursor.execute(f'SELECT * FROM {self.table_name} WHERE {ref_column} = \'{value}\'')
+            data: list = self.cursor.fetchall()
             
-            if password == password_ and len(password) > 1:
-                name = data[0][2]
-                surname = data[0][3] 
-                token = data[0][6] 
+            print(data)
+            return data
+        except psycopg2.InterfaceError as e:
+            return [e]
+        
+    def select_data_integer(self, ref_column: str, value: str) -> list:
+        try:
+            self.cursor.execute(f'SELECT * FROM {self.table_name} WHERE {ref_column} = {value}')
+            data: list = self.cursor.fetchall()
+
+            return data
+        except:
+            return []
+        
+    def check_user(self, mail: str, password: str) -> str:
+        try:
+            mail = mail.upper()
+            data: list = self.select_data_varchar("mail", mail)
+            
+            token: str = ""
+            password_: str = ""
+            name : str = ""
+            surname: str = ""
+            status: str = "bad"
+            
+            if len(data) != 0:
+                password_ = data[0][4]
+                password_ = self.encryptor.decrypt(password_)
+                print(password)
                 
-                status = "ok"
+                if password == password_ and len(password) > 1:
+                    name = data[0][2]
+                    surname = data[0][3] 
+                    token = data[0][6] 
+                    
+                    status = "ok"
+                else:
+                    status = "Invalid password or username" 
             else:
-                status = "Invalid password or username" 
-        else:
-            status = "User not Found"
-        
-        
-        return (status, token, surname, name)
-    
+                status = "User not Found"
+            
+            
+            return (status, token, surname, name)
+        except Exception as e:
+            return {'Exception': e}
+            
     def rollback(self) -> None:
         self.cursor.execute("ROLLBACK")
-        conn.commit()
+        self.conn.commit()
     
 if __name__ == '__main__':
     user = Users()
