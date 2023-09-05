@@ -60,23 +60,26 @@ class Users():
         password_: str = ""
         name : str = ""
         surname: str = ""
+        status: str = "bad"
         
         if len(data) != 0:
-            name = data[0][2]
-            surname = data[0][3] 
             password_ = data[0][4]
-            token = data[0][6] 
             password_ = self.encryptor.decrypt(password_)
+            print(password)
+            
+            if password == password_ and len(password) > 1:
+                name = data[0][2]
+                surname = data[0][3] 
+                token = data[0][6] 
+                
+                status = "ok"
+            else:
+                status = "Invalid password or username" 
         else:
-            token = "User not Found"
-            return (token, surname, name)
+            status = "User not Found"
         
-        if password == password_:
-            return (token, surname, name)
-        else:
-            return "Invalid password or username"
         
-        return None
+        return (status, token, surname, name)
     
     def rollback(self) -> None:
         self.cursor.execute("ROLLBACK")
