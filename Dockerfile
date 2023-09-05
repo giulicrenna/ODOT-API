@@ -13,4 +13,4 @@ WORKDIR /service
 RUN pip install -r requirements.txt 
 
 # uvicorn main:run --host 0.0.0.0 --port 8000
-CMD ["uvicorn", "main:api", "--host", "0.0.0.0", "--port", "8100"]
+CMD ["uvicorn", "main:api", "--host", "0.0.0.0", "--port", "8100", "--ssl-keyfile", "/service/certs/cert.key", "--ssl-certfile", "/service/certs/cert.crt"]

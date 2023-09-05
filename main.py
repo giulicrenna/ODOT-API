@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from src.database_connector import Users
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+#from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 api = FastAPI()
 user = Users()
 
-api.add_middleware(HTTPSRedirectMiddleware)
+#api.add_middleware(HTTPSRedirectMiddleware)
 api.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,6 +36,9 @@ async def register(mail: str,
 @api.get("/login")
 async def login(mail: str,
                 password: str) -> dict:
-    token: str = user.check_user(mail, password)
+    token, surname, name = user.check_user(mail, password)
     
-    return {"status" : token}
+    return {"status" : "ok",
+            "token" : token,
+            "name": name,
+            "surname": surname}
