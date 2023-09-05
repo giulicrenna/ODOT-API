@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from src.database_connector import Users
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 api = FastAPI()
 
-origins = ["http://localhost:8100", "http://127.0.0.1:8100", "http://0.0.0.0:8100"]
-
+api.add_middleware(HTTPSRedirectMiddleware)
 api.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
