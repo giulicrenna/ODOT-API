@@ -1,7 +1,19 @@
 from fastapi import FastAPI
 from src.database_connector import Users
+from fastapi.middleware.cors import CORSMiddleware
 
 api = FastAPI()
+
+origins = ["http://localhost:8100", "http://127.0.0.1:8100", "http://0.0.0.0:8100"]
+
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],  # You can specify specific HTTP methods (e.g., ["GET", "POST"])
+    allow_headers=["*"],  # You can specify specific HTTP headers
+)
+
 
 @api.get("/")
 async def root() -> None:
