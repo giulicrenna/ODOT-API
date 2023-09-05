@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 api = FastAPI()
+user = Users()
 
 api.add_middleware(HTTPSRedirectMiddleware)
 api.add_middleware(
@@ -26,16 +27,15 @@ async def register(mail: str,
                    name: str,
                    surname: str) -> dict:
     try:
-        user = Users()
         user.add_new_user(mail, password, name, surname, type)
         return {"Status" : "User register succesfully"}
+    
     except Exception as e:
         return {"Exception": str(e)}
         
 @api.get("/login")
 async def login(mail: str,
                 password: str) -> dict:
-    user = Users()
     token: str = user.check_user(mail, password)
     
     return {"status" : token}
