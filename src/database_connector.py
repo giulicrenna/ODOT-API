@@ -26,7 +26,7 @@ class Users():
         self.cursor = self.conn.cursor()
         self.encryptor = Encryptor()
         
-    def add_new_user(self, mail: str, password: str, name: str, surname: str, type: str) -> None:
+    def add_new_user(self, mail: str, password: str, name: str, surname: str, type: str) -> str:
         try:
             token: str = str(uuid.uuid4())
             mail = mail.replace(" ",  "").upper()  
@@ -39,8 +39,9 @@ class Users():
             self.cursor.execute(f'INSERT INTO {self.table_name} (name, surname, mail, password, type, token) \
                 VALUES (\'{name}\', \'{surname}\', \'{mail}\', \'{password}\', \'{type}\', \'{token}\')')
             self.conn.commit()
+            return "ok"
         except psycopg2.InterfaceError:
-            return None
+            return "bad"
         
     def select_data_varchar(self, ref_column: str, value: str) -> list:
         try:

@@ -29,8 +29,8 @@ async def register(mail: str,
                    name: str,
                    surname: str) -> dict:
     try:
-        user.add_new_user(mail, password, name, surname, type)
-        return {"Status" : "User register succesfully"}
+        status: str = user.add_new_user(mail, password, name, surname, type)
+        return {"status" : status}
     
     except Exception as e:
         return {"Exception": str(e)}
