@@ -40,11 +40,12 @@ async def register(mail: str,
 @app.get("/login")
 async def login(mail: str,
                 password: str) -> dict:
-    status, token, surname, name = user.check_user(mail, password)
+    status, token, surname, name, type = user.check_user(mail, password)
     json: dict = {"status" : status,
             "token" : token,
             "name": name,
-            "surname": surname}
+            "surname": surname,
+            "type": type}
     return json
     
     
