@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from src.database_connector import Users
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+import uvicorn
 
 api = FastAPI()
 user = Users()
@@ -49,3 +50,6 @@ async def login(mail: str,
 """
 uvicorn main:api --host 0.0.0.0 --port 8100 --ssl-keyfile certs/cert.key --ssl-certfile certs/cert.crt  
 """
+
+if __name__ == '__main__':
+    uvicorn.run(api, host='0.0.0.0', port=8100)
