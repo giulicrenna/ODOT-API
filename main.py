@@ -4,13 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 import uvicorn
 
-api = FastAPI()
+app = FastAPI()
 user = Users()
 
 origins: list = ['190.2.104.63:8100', '190.2.104.63', '0.0.0.0', '0.0.0.0:8100']
 
-api.add_middleware(HTTPSRedirectMiddleware)
-api.add_middleware(
+app.add_middleware(HTTPSRedirectMiddleware)
+app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
     allow_credentials=True,
@@ -19,11 +19,11 @@ api.add_middleware(
 )
 
 
-@api.get("/")
+@app.get("/")
 async def root() -> None:
     return {"Status" : "Ok"}
 
-@api.post("/register")
+@app.post("/register")
 async def register(mail: str,
                    password: str,
                    type: str,
@@ -36,7 +36,7 @@ async def register(mail: str,
     except Exception as e:
         return {"Exception": str(e)}
         
-@api.get("/login")
+@app.get("/login")
 async def login(mail: str,
                 password: str) -> dict:
     status, token, surname, name = user.check_user(mail, password)
@@ -48,10 +48,10 @@ async def login(mail: str,
     
     
 """
-uvicorn main:api --host 0.0.0.0 --port 8100 --ssl-keyfile certs/cert.key --ssl-certfile certs/cert.crt  
+uvicorn main:app --host 0.0.0.0 --port 8100 --ssl-keyfile certs/cert.key --ssl-certfile certs/cert.crt  
 """
 
 """
 if __name__ == '__main__':
-    uvicorn.run(api, host='0.0.0.0', port=80)
+    uvicorn.run(app, host='0.0.0.0', port=80)
 """
