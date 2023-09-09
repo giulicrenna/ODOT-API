@@ -71,6 +71,7 @@ class Users():
             password_: str = ""
             name : str = ""
             surname: str = ""
+            type: str = ""
             status: str = "bad"
             
             if len(data) != 0:
@@ -82,7 +83,7 @@ class Users():
                     name = data[0][2]
                     surname = data[0][3] 
                     token = data[0][6] 
-                    
+                    type = data[0][5]
                     status = "ok"
                 else:
                     status = "Invalid password or username" 
@@ -90,7 +91,7 @@ class Users():
                 status = "User not Found"
             
             
-            return (status, token, surname, name)
+            return (status, token, surname, name, type)
         except Exception as e:
             return {'Exception': e}
             
