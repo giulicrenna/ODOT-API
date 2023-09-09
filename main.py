@@ -52,4 +52,4 @@ uvicorn main:api --host 0.0.0.0 --port 8100 --ssl-keyfile certs/cert.key --ssl-c
 """
 
 if __name__ == '__main__':
-    uvicorn.run(api, host='0.0.0.0', port=8100)
+    uvicorn.run(api, host='0.0.0.0', port=80)
