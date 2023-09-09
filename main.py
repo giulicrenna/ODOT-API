@@ -32,8 +32,9 @@ async def register(mail: str,
     try:
         status: str = user.add_new_user(mail, password, name, surname, type)
         return {"status" : status}
-    
+
     except Exception as e:
+        user.rollback()
         return {"Exception": str(e)}
         
 @app.get("/login")
